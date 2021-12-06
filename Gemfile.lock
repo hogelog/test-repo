@@ -2,12 +2,14 @@ GEM
   remote: https://rubygems.org/
   specs:
     cgi (0.3.1)
+    date (3.2.2)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   cgi
+  date
 
 BUNDLED WITH
    2.2.32
