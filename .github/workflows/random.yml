@@ -1,14 +1,22 @@
-# This is a basic workflow to help you get started with Actions
-
 name: random command
 
-# Controls when the workflow will run
 on:
   workflow_dispatch:
-
+  push:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - run: exit $(($RANDOM % 2 == 0))
+      - run: exit 0
+      - if: ${{ github.ref_name == 'main' || !success() }}
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          fields: workflow,job,commit,repo,ref,author,took
+          custom_payload: |
+            {
+              text: `${ '${{ job.status }}' == 'success' ? ':white_check_mark:' : ':no_entry:'} ${process.env.AS_WORKFLOW} ${{ job.status }} ${process.env.AS_REPO}@${{ github.ref_name }} (${process.env.AS_COMMIT}) by ${process.env.AS_AUTHOR} in ${process.env.AS_TOOK}`,
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
