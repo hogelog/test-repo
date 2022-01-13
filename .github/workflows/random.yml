@@ -8,6 +8,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - run: echo ${{ env.GITHUB_REF_NAME }}
+      - run: echo ${{ env.REF_NAME }}
+        env:
+          REF_NAME: ${{ env.GITHUB_REF_NAME }}
+      - run: echo $GITHUB_REF_NAME
+      - run: echo ${{ github.ref_name }}
+      - run: echo ${{ toJSON(env) }}
       - run: exit 0
       - if: always()
         uses: 8398a7/action-slack@v3
