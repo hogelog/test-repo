@@ -11,6 +11,8 @@ jobs:
     outputs:
       projects: ${{ steps.list-projects.outputs.projects }}
     steps:
+      - run: echo ${{ toJSON(github.event) }}
+      - run: git diff main --name-only
       - id: list-projects
         run: |
           echo "projects=$(git diff main --name-only | grep projects/ | jq -R -s -c split('\n')[:-1])" >> $GITHUB_OUTPUT
