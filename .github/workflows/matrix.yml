@@ -1,0 +1,25 @@
+name: matrix
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    outputs:
+      projects: ${{ steps.list-projects.outputs.projects }}
+    steps:
+      - id: list-projects
+        run: |
+          echo "projects=$(git diff main --name-only | grep projects/ | jq -R -s -c split('\n')[:-1])" >> $GITHUB_OUTPUT
+  build:
+    runs-on: ubuntu-latest
+    needs: list
+    strategy:
+      fail-fast: false
+      matrix:
+        project: ${{fromJson(needs.list.outputs.projects)}}
+    steps:
+      - run: echo ${{ matrix.project }}
