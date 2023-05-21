@@ -9,19 +9,35 @@ jobs:
   list:
     runs-on: ubuntu-latest
     outputs:
-      projects: ${{ steps.list-projects.outputs.projects }}
+      projects: ${{ steps.list.outputs.projects }}
     steps:
-      - run: echo ${{ toJSON(github.event) }}
-      - run: git diff main --name-only
-      - id: list-projects
+      - id: compare
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const { data: comparison } = await github.rest.repos.compareCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              base: context.payload.before,
+              head: context.payload.after,
+            })
+            const diffs = comparison.files
+              .filter(file => file.patch)
+              .map(file => (file.filename))
+            const result = JSON.stringify(diffs, null, 0)
+            console.log(result)
+            return result
+      - id: list
         run: |
-          echo "projects=$(git diff main --name-only | grep projects/ | jq -R -s -c split('\n')[:-1])" >> $GITHUB_OUTPUT
+          echo '${{ steps.compare.outputs.result }}' | jq -r '.[]' | egrep -o 'projects/[^/]+' | sort -u | jq -nRc '[inputs]' | tee projects.json
+          echo "projects=$(cat projects.json)" >> $GITHUB_OUTPUT
   build:
     runs-on: ubuntu-latest
     needs: list
     strategy:
       fail-fast: false
       matrix:
-        project: ${{fromJson(needs.list.outputs.projects)}}
+        project: ${{ fromJSON(needs.list.outputs.projects) }}
     steps:
       - run: echo ${{ matrix.project }}
