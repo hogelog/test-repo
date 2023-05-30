@@ -1,0 +1,19 @@
+name: action
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    outputs:
+      projects: ${{ steps.list.outputs.projects }}
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            const json = JSON.stringify(context, null, 0);
+            console.log(json)
