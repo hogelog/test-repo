@@ -1,0 +1,16 @@
+name: action
+
+on:
+  push:
+
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    outputs:
+      projects: ${{ steps.list.outputs.projects }}
+    steps:
+      - id: compare
+        uses: hogelog/commit-diff-action@1d8094c97d0e64a2a204a682fca3fd7dad9b0979
+      - run: |
+          echo '${{ steps.compare.outputs.diffsJSON }}'
+          echo '${{ steps.compare.outputs.diffs }}'
