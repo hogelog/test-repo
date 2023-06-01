@@ -14,8 +14,6 @@ jobs:
     steps:
       - id: compare
         uses: hogelog/commit-diff-action@HEAD
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
       - run: |
           echo '${{ steps.compare.outputs.diffsJSON }}'
           echo '${{ steps.compare.outputs.diffs }}'
